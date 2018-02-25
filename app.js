@@ -17,25 +17,30 @@ app.get("/", function(req, res){
 });
 
 app.get(/^\/(\d{5})$/, function(req, res, next){
+
   var zipcode = req.params[0];
+  console.log("입력된 숫자" + zipcode);
   var location = zipdb.zipcode(zipcode);
+
   if(!location.zipcode){
     next();
     return;
   }
-
+  console.log(JSON.stringify(location));
   var latitude = location.latitude;
-  var longtitude = location.longtitude;
+  var longitude = location.longitude;
+  console.log("lat:" + latitude + " / " + "lng:" + longitude);
 
-  weather.forecast(latitude, longtitude, function(err, data){
+  weather.forecast(latitude, longitude, function(err, data){
     if(err){
+      console.log("weather forecast error" + err);
       next();
       return;
     }
     res.json({
       zipocde : zipcode,
       lat: latitude,
-      lng: longtitude,
+      lng: longitude,
       temperature: data.currently.temperature
     })
   });
@@ -44,3 +49,5 @@ app.get(/^\/(\d{5})$/, function(req, res, next){
 app.use(function(req, res){
   res.status(404).render("404");
 });
+
+app.listen(3000);
